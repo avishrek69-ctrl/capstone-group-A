@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String              @id @default(uuid())
+  email         String              @unique
+  password_hash String
+  name          String
+  preferences   Json?
+  created_at    DateTime            @default(now())
+  shoots        ShootSession[]
+  favourites    FavouriteLocation[]
+}
+
+model ShootSession {
+  id               String   @id @default(uuid())
+  user_id          String
+  user             User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  location_name    String
+  latitude         Float
+  longitude        Float
+  shoot_date       DateTime @db.Date
+  shoot_time       String?
+  session_type     String
+  suitability_score Int?
+  notes            String?
+  created_at       DateTime @default(now())
+}
+
+model FavouriteLocation {
+  id        String @id @default(uuid())
+  user_id   String
+  user      User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  name      String
+  latitude  Float
+  longitude Float
+  suburb    String?
+}
