@@ -41,7 +41,8 @@ export default function RegisterPage() {
     try {
       setError(null);
       await register(data.name, data.email, data.password);
-      router.push("/dashboard");
+      const user = useAuthStore.getState().user;
+      router.push(user?.isPhotographer ? "/photographer/bookings" : "/dashboard");
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data
@@ -144,6 +145,10 @@ export default function RegisterPage() {
           <Link href="/login" className="font-medium text-foreground underline-offset-4 hover:underline">
             Log in
           </Link>
+        </p>
+
+        <p className="mt-2 text-center text-xs text-muted-foreground">
+          Photographer account? <Link href="/photographer/login" className="underline-offset-4 hover:underline">Use the photographer portal</Link>
         </p>
 
       </div>

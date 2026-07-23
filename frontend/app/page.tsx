@@ -75,6 +75,9 @@ export default function LandingPage() {
             <Button variant="ghost" size="sm" asChild>
               <Link href="/login">Log in</Link>
             </Button>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/photographer/login">Photographer portal</Link>
+            </Button>
             <Button size="sm" asChild>
               <Link href="/register">Get started</Link>
             </Button>
@@ -110,6 +113,9 @@ export default function LandingPage() {
           </Button>
           <Button size="lg" variant="outline" asChild>
             <Link href="/login">Log in to your account</Link>
+          </Button>
+          <Button size="lg" variant="ghost" asChild>
+            <Link href="/photographer/login">Photographer portal</Link>
           </Button>
         </div>
       </section>

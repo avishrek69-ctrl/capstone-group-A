@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import prisma from "../db/index.js";
+import { toAuthUser } from "../utils/photographer-access.js";
 
 export const verifyJWT = async (req, res, next) => {
   try {
@@ -25,7 +26,7 @@ export const verifyJWT = async (req, res, next) => {
       return res.status(401).json({ message: "User no longer exists." });
     }
 
-    req.user = user;
+    req.user = toAuthUser(user);
     next();
   } catch (err) {
     if (err.name === "TokenExpiredError") {

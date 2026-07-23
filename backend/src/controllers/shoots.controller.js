@@ -1,5 +1,6 @@
 import prisma from "../db/index.js";
 import { SESSION_TYPES } from "../constant.js";
+import { getPhotographerEmails } from "../utils/photographer-access.js";
 
 /**
  * GET /api/shoots
@@ -10,6 +11,42 @@ export const getShoots = async (req, res, next) => {
     const shoots = await prisma.shootSession.findMany({
       where: { user_id: req.user.id },
       orderBy: { shoot_date: "asc" },
+    });
+
+    return res.status(200).json({ shoots });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * GET /api/shoots/photographer/bookings
+ * List all customer shoot sessions for the authenticated photographer.
+ */
+export const getPhotographerBookings = async (req, res, next) => {
+  try {
+    if (!req.user.isPhotographer) {
+      return res.status(403).json({ message: "Photographer access required." });
+    }
+
+    const photographerEmails = getPhotographerEmails();
+    const shoots = await prisma.shootSession.findMany({
+      where: photographerEmails.length > 0
+        ? { user: { email: { notIn: photographerEmails } } }
+        : undefined,
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: [
+        { shoot_date: "asc" },
+        { created_at: "desc" },
+      ],
     });
 
     return res.status(200).json({ shoots });

@@ -10,9 +10,24 @@ import locationsRouter  from "./routes/locations.routes.js";
 
 const app = express();
 
+const configuredOrigins = (process.env.FRONTEND_URL || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: (origin, callback) => {
+      // Allow non-browser clients (curl, server-to-server) that do not send Origin.
+      if (!origin) return callback(null, true);
+
+      // If FRONTEND_URL is not configured, allow all origins to avoid accidental deploy lockout.
+      if (configuredOrigins.length === 0) return callback(null, true);
+
+      if (configuredOrigins.includes(origin)) return callback(null, true);
+
+      return callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
     credentials: true,
   })
 );

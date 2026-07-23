@@ -6,6 +6,7 @@ export interface AuthUser {
   email: string;
   name: string;
   created_at: string;
+  isPhotographer: boolean;
 }
 
 interface AuthStore {
@@ -81,7 +82,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   logout: async () => {
     try {
       await api.post("/auth/logout");
-    } catch (e) {
+    } catch {
       // Ignore logout errors
     }
     set({ user: null });

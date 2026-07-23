@@ -3,17 +3,10 @@ import jwt from "jsonwebtoken";
 import validator from "validator";
 import prisma from "../db/index.js";
 import { JWT_EXPIRY } from "../constant.js";
+import { toAuthUser } from "../utils/photographer-access.js";
 
 const signToken = (userId) =>
   jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: JWT_EXPIRY });
-
-const safeUser = ({ id, email, name, preferences, created_at }) => ({
-  id,
-  email,
-  name,
-  preferences,
-  created_at,
-});
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
@@ -59,7 +52,7 @@ export const register = async (req, res, next) => {
     const token = signToken(user.id);
 
     res.cookie("token", token, COOKIE_OPTIONS);
-    return res.status(201).json({ user: safeUser(user), token });
+    return res.status(201).json({ user: toAuthUser(user), token });
   } catch (err) {
     next(err);
   }
@@ -90,7 +83,7 @@ export const login = async (req, res, next) => {
     const token = signToken(user.id);
 
     res.cookie("token", token, COOKIE_OPTIONS);
-    return res.status(200).json({ user: safeUser(user), token });
+    return res.status(200).json({ user: toAuthUser(user), token });
   } catch (err) {
     next(err);
   }
