@@ -31,7 +31,7 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-const PUBLIC_PATHS = ["/", "/login", "/register", "/photographer/login"];
+const PUBLIC_PATHS = ["/", "/login", "/register", "/photographer/login", "/photographer/register"];
 
 // On 401, clear auth state and redirect to login
 api.interceptors.response.use(

@@ -3,7 +3,11 @@ import jwt from "jsonwebtoken";
 import validator from "validator";
 import prisma from "../db/index.js";
 import { JWT_EXPIRY } from "../constant.js";
-import { toAuthUser } from "../utils/photographer-access.js";
+import {
+  getPhotographerEmails,
+  isPhotographerEmail,
+  toAuthUser,
+} from "../utils/photographer-access.js";
 
 const signToken = (userId) =>
   jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: JWT_EXPIRY });
@@ -46,6 +50,62 @@ export const register = async (req, res, next) => {
         name: name.trim(),
         email: email.toLowerCase(),
         password_hash,
+      },
+    });
+
+    const token = signToken(user.id);
+
+    res.cookie("token", token, COOKIE_OPTIONS);
+    return res.status(201).json({ user: toAuthUser(user), token });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const registerPhotographer = async (req, res, next) => {
+  try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "Name, email and password are required." });
+    }
+
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ message: "Invalid email address." });
+    }
+
+    if (!validator.isLength(password, { min: 8 })) {
+      return res.status(400).json({ message: "Password must be at least 8 characters." });
+    }
+
+    const normalizedEmail = email.toLowerCase();
+    const photographerEmails = getPhotographerEmails();
+
+    if (photographerEmails.length > 0 && !isPhotographerEmail(normalizedEmail)) {
+      return res.status(403).json({
+        message: "This email is not approved for photographer access.",
+      });
+    }
+
+    const existing = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (existing) {
+      return res.status(409).json({ message: "An account with this email already exists." });
+    }
+
+    const password_hash = await bcrypt.hash(password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        name: name.trim(),
+        email: normalizedEmail,
+        password_hash,
+        preferences: {
+          role: "photographer",
+          isPhotographer: true,
+        },
       },
     });
 

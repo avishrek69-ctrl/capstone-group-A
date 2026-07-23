@@ -15,6 +15,7 @@ interface AuthStore {
   hydrate: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
+  registerPhotographer: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   clearUser: () => void;
 }
@@ -72,6 +73,19 @@ export const useAuthStore = create<AuthStore>((set) => ({
       password,
     });
     // Store token in localStorage
+    if (data.token) {
+      localStorage.setItem(TOKEN_KEY, data.token);
+      api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+    }
+    set({ user: data.user, isLoading: false });
+  },
+
+  registerPhotographer: async (name, email, password) => {
+    const { data } = await api.post<{ user: AuthUser; token: string }>("/auth/register/photographer", {
+      name,
+      email,
+      password,
+    });
     if (data.token) {
       localStorage.setItem(TOKEN_KEY, data.token);
       api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;

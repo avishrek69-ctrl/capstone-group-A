@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const AUTH_PAGES = ["/", "/login", "/register", "/photographer/login"];
+const AUTH_PAGES = ["/", "/login", "/register", "/photographer/login", "/photographer/register"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -27,6 +27,7 @@ export const config = {
     "/login",
     "/register",
     "/photographer/login",
+    "/photographer/register",
     "/photographer/bookings/:path*",
     "/dashboard/:path*",
     "/planner/:path*",
