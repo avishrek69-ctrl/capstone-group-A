@@ -44,7 +44,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       email,
       password,
     });
-    set({ user: data.user });
+    set({ user: data.user, isLoading: false });
   },
 
   register: async (name, email, password) => {
@@ -53,7 +53,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       email,
       password,
     });
-    set({ user: data.user });
+    set({ user: data.user, isLoading: false });
   },
 
   logout: async () => {
