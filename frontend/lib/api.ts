@@ -1,10 +1,16 @@
 import axios from "axios";
 
-// Determine API URL - prioritize env var, but default to Render backend
-let apiBaseUrl = "https://capstone-group-a-1.onrender.com/api";
-if (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_URL) {
-  apiBaseUrl = process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
-}
+const FALLBACK_API_BASE_URL = "https://capstone-group-a-1.onrender.com/api";
+
+const normalizeApiBaseUrl = (rawUrl?: string) => {
+  const trimmed = (rawUrl || "").trim().replace(/\/$/, "");
+  if (!trimmed) return FALLBACK_API_BASE_URL;
+
+  // Guard against common misconfiguration where env is set to host without /api.
+  return trimmed.endsWith("/api") ? trimmed : `${trimmed}/api`;
+};
+
+const apiBaseUrl = normalizeApiBaseUrl(process.env.NEXT_PUBLIC_API_URL);
 
 const api = axios.create({
   baseURL: apiBaseUrl,
