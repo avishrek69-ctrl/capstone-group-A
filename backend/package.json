@@ -9,7 +9,8 @@
   "scripts": {
     "dev":   "nodemon -r dotenv/config --experimental-json-modules src/index.js",
     "build": "prisma generate",
-    "start": "node -r dotenv/config --experimental-json-modules src/index.js"
+    "start": "node -r dotenv/config --experimental-json-modules src/index.js",
+    "test": "node --test"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.4.2",
