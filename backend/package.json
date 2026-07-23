@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "dev":   "nodemon -r dotenv/config --experimental-json-modules src/index.js",
-    "build": "prisma generate",
+    "build": "prisma generate && node -e \"const { config } = require('dotenv'); const { spawnSync } = require('child_process'); config(); const url = process.env.DATABASE_URL || ''; if (url.startsWith('postgres')) { const result = spawnSync('npx', ['prisma', 'migrate', 'deploy'], { stdio: 'inherit' }); process.exit(result.status ?? 1); }\"",
     "start": "node -r dotenv/config --experimental-json-modules src/index.js",
     "test": "node --test"
   },
