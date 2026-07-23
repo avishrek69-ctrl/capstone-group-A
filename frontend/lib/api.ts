@@ -3,19 +3,10 @@ import axios from "axios";
 const getApiBaseUrl = () => {
   // First: check environment variable
   if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
   }
 
-  // Second: detect at runtime if we're in production
-  if (typeof window !== "undefined") {
-    // If running in a browser, check the hostname
-    if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
-      // Production: use Render backend
-      return "https://capstone-group-a-1.onrender.com/api";
-    }
-  }
-
-  // Default fallback
+  // Default to Render backend
   return "https://capstone-group-a-1.onrender.com/api";
 };
 
@@ -23,6 +14,14 @@ const api = axios.create({
   baseURL: getApiBaseUrl(),
   withCredentials: true, // sends HttpOnly cookie on every request
   headers: { "Content-Type": "application/json" },
+});
+
+// Override baseURL on first request to ensure it's set from browser context
+api.interceptors.request.use((config) => {
+  if (!config.baseURL || config.baseURL === "undefined") {
+    config.baseURL = "https://capstone-group-a-1.onrender.com/api";
+  }
+  return config;
 });
 
 const PUBLIC_PATHS = ["/", "/login", "/register"];
