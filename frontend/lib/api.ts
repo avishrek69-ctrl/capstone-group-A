@@ -1,13 +1,26 @@
 import axios from "axios";
 
-const FALLBACK_API_URL = "https://capstone-group-a-1.onrender.com/api";
-const resolvedApiUrl = (
-  process.env.NEXT_PUBLIC_API_URL ||
-  (process.env.NODE_ENV === "production" ? FALLBACK_API_URL : "http://localhost:8000/api")
-).replace(/\/$/, "");
+const getApiBaseUrl = () => {
+  // First: check environment variable
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+
+  // Second: detect at runtime if we're in production
+  if (typeof window !== "undefined") {
+    // If running in a browser, check the hostname
+    if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+      // Production: use Render backend
+      return "https://capstone-group-a-1.onrender.com/api";
+    }
+  }
+
+  // Default fallback
+  return "https://capstone-group-a-1.onrender.com/api";
+};
 
 const api = axios.create({
-  baseURL: resolvedApiUrl,
+  baseURL: getApiBaseUrl(),
   withCredentials: true, // sends HttpOnly cookie on every request
   headers: { "Content-Type": "application/json" },
 });
