@@ -1,7 +1,13 @@
 import axios from "axios";
 
+const FALLBACK_API_URL = "https://capstone-group-a-1.onrender.com/api";
+const resolvedApiUrl = (
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === "production" ? FALLBACK_API_URL : "http://localhost:8000/api")
+).replace(/\/$/, "");
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: resolvedApiUrl,
   withCredentials: true, // sends HttpOnly cookie on every request
   headers: { "Content-Type": "application/json" },
 });
