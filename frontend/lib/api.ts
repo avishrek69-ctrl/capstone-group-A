@@ -1,27 +1,15 @@
 import axios from "axios";
 
-const getApiBaseUrl = () => {
-  // First: check environment variable
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
-  }
-
-  // Default to Render backend
-  return "https://capstone-group-a-1.onrender.com/api";
-};
+// Determine API URL - prioritize env var, but default to Render backend
+let apiBaseUrl = "https://capstone-group-a-1.onrender.com/api";
+if (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_URL) {
+  apiBaseUrl = process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
+}
 
 const api = axios.create({
-  baseURL: getApiBaseUrl(),
+  baseURL: apiBaseUrl,
   withCredentials: true, // sends HttpOnly cookie on every request
   headers: { "Content-Type": "application/json" },
-});
-
-// Override baseURL on first request to ensure it's set from browser context
-api.interceptors.request.use((config) => {
-  if (!config.baseURL || config.baseURL === "undefined") {
-    config.baseURL = "https://capstone-group-a-1.onrender.com/api";
-  }
-  return config;
 });
 
 const PUBLIC_PATHS = ["/", "/login", "/register"];
