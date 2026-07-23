@@ -26,8 +26,16 @@ export const useAuthStore = create<AuthStore>((set) => ({
     try {
       const { data } = await api.get<{ user: AuthUser }>("/auth/me");
       set({ user: data.user, isLoading: false });
-    } catch {
-      set({ user: null, isLoading: false });
+    } catch (err) {
+      // Only clear user if we got a 401 (unauthorized)
+      // For other errors (network, etc), keep the existing user state
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      if (status === 401) {
+        set({ user: null, isLoading: false });
+      } else {
+        // Keep existing user, just stop loading
+        set((state) => ({ ...state, isLoading: false }));
+      }
     }
   },
 
