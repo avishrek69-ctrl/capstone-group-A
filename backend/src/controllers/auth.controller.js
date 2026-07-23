@@ -59,7 +59,7 @@ export const register = async (req, res, next) => {
     const token = signToken(user.id);
 
     res.cookie("token", token, COOKIE_OPTIONS);
-    return res.status(201).json({ user: safeUser(user) });
+    return res.status(201).json({ user: safeUser(user), token });
   } catch (err) {
     next(err);
   }
@@ -90,7 +90,7 @@ export const login = async (req, res, next) => {
     const token = signToken(user.id);
 
     res.cookie("token", token, COOKIE_OPTIONS);
-    return res.status(200).json({ user: safeUser(user) });
+    return res.status(200).json({ user: safeUser(user), token });
   } catch (err) {
     next(err);
   }
